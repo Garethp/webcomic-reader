@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "author": "Gareth Parker",
+  "name": "Webcomic Reader",
+  "version": "1.0.0",
+
+  "action": {
+    "default_icon": {
+      "48": "icons/comic.png"
+    }
+  },
+
+  "icons": {
+    "48": "icons/comic.png"
+  },
+
+  "permissions": [
+    "tabs",
+    "scripting",
+    "contextMenus",
+    "storage",
+    "activeTab",
+    "privacy"
+  ],
+  "background": {
+    "service_worker": "build/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "lib/browser-polyfill.js",
+        "build/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}
