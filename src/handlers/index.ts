@@ -18,6 +18,7 @@ import { Unsounded } from "./Unsounded";
 import { Wildlife } from "./Wildlife";
 import { DumbingOfAge } from "./DumbingOfAge";
 import { Paranatural } from "./Paranatural";
+import { QuestionableContent } from "./QuestionableContent";
 
 const browser = require("webextension-polyfill");
 
@@ -40,6 +41,7 @@ const handlers: Array<(new () => SiteHandler) & { urlStartsWith: string }> = [
   Wildlife,
   DumbingOfAge,
   Paranatural,
+  QuestionableContent,
 ];
 
 const GetCustomHandlers = async (): Promise<SiteHandler[]> => {
@@ -62,8 +64,6 @@ const GetCustomHandlers = async (): Promise<SiteHandler[]> => {
 export const GetHandlerByUrl = async (
   url: string
 ): Promise<SiteHandler | undefined> => {
-  console.log(GirlGenius.urlStartsWith);
-
   const foundHandler = handlers.find((handler) => {
     return url.indexOf(handler.urlStartsWith) > -1;
   });

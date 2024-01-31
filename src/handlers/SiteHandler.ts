@@ -6,10 +6,30 @@ export abstract class SiteHandler {
   urlStartsWith: string;
   imageMatchRegex?: RegExp | undefined;
   canLoadNextImage: boolean = true;
+  elementModifiers: Record<string, (element: Element) => void> = {};
 
-  before: () => void = () => {};
-  after: () => void = () => {
-    if (this.canLoadNextImage) return;
+  attachElementModifiers() {
+    Object.keys(this.elementModifiers).forEach((elementIdentifier) => {
+      const modifier = this.elementModifiers[elementIdentifier];
+      new MutationObserver(function (mutations) {
+        if (document.querySelector(elementIdentifier)) {
+          const element = document.querySelector(elementIdentifier);
+          modifier(element);
+          this.disconnect();
+        }
+      }).observe(document, { childList: true, subtree: true });
+    });
+  }
+
+  before() {}
+
+  async after() {
+    const canPrefetch = await browser.runtime.sendMessage({
+      type: "canPreload",
+    });
+
+    if (canPrefetch && this.canLoadNextImage) return;
+
     canUseSpeculationRules().then((canPreload) => {
       if (canPreload) return;
 
@@ -30,29 +50,18 @@ export abstract class SiteHandler {
           });
 
           document.body.appendChild(next_page_frame_element);
-
-          // next_page_frame_element.contentWindow.document.addEventListener(
-          //   "DOMContentLoaded",
-          //   async () => {
-          //     console.log("Setting images to eager");
-          //     next_page_frame_element.contentWindow.document
-          //       .querySelectorAll("img[loading=lazy]")
-          //       .forEach((img) => {
-          //         img.setAttribute("loading", "eager");
-          //       });
-          //   }
-          // );
         }
       );
     });
-  };
+  }
 
   scrollIntoView: () => void = () => {};
   abstract getNextPageButton: () => HTMLAnchorElement;
   abstract getPreviousPageButton: () => HTMLAnchorElement;
 
   getImageUrlFromPageUrl = async (url: string): Promise<string | undefined> => {
-    if (this.imageMatchRegex === undefined) return undefined;
+    if (!this.canLoadNextImage || this.imageMatchRegex === undefined)
+      return undefined;
 
     return fetch(url)
       .then((result) => result.text())

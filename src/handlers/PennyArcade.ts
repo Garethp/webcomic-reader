@@ -7,7 +7,7 @@ export class PennyArcade extends SiteHandler {
   canLoadNextImage = false;
 
   getNextPageButton = () =>
-    document.querySelector("a.older") as HTMLAnchorElement;
-  getPreviousPageButton = () =>
     document.querySelector("a.newer") as HTMLAnchorElement;
+  getPreviousPageButton = () =>
+    document.querySelector("a.older") as HTMLAnchorElement;
 }

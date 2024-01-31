@@ -6,7 +6,11 @@ export class LookingForGroup extends SiteHandler {
   static urlStartsWith = "lfg.co/page";
   imageMatchRegex = /<div id="comic-img">\s+?<img src="(.*?)"/;
 
-  after = () => (document.getElementById("comic-wrap").style.margin = "auto");
+  elementModifiers = {
+    "#comic-wrap": (element: HTMLElement) => (element.style.margin = "auto"),
+    "#sidebars": (element: HTMLElement) => element.remove(),
+  };
+
   scrollIntoView = () =>
     document.getElementById("page-title").scrollIntoView(true);
 

@@ -4,80 +4,18 @@ export class GirlGenius extends SiteHandler {
   name = "Girl Genius";
   static urlStartsWith = "girlgeniusonline.com";
 
-  before = () => {
-    new MutationObserver(function (mutations) {
-      if (document.getElementById("sidebar")) {
-        document.getElementById("sidebar").remove();
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
-
-    new MutationObserver(function (mutations) {
-      if (document.querySelector("#comicbody > table")) {
-        document.querySelector("#comicbody > table").remove();
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
-
-    new MutationObserver(function (mutations) {
-      if (document.querySelector("#comicbody > p")) {
-        document.querySelector("#comicbody > p").remove();
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
-
-    new MutationObserver(function (mutations) {
-      if (document.querySelector("#comicbody > p")) {
-        document.querySelector("#comicbody > p").remove();
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
-
-    new MutationObserver(function (mutations) {
-      if (document.getElementById("comicarea")) {
-        document.getElementById("comicarea").style.float = "none";
-        document.getElementById("comicarea").style.margin = "0 auto";
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
-
-    new MutationObserver(function (mutations) {
-      if (document.getElementById("bottomnext")) {
-        const button = document.getElementById(
-          "bottomnext"
-        ) as HTMLAnchorElement;
-        button.href = button.href.replace("http://", "https://");
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
-
-    new MutationObserver(function (mutations) {
-      if (document.getElementById("bottomprev")) {
-        const button = document.getElementById(
-          "bottomprev"
-        ) as HTMLAnchorElement;
-        button.href = button.href.replace("http://", "https://");
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
-
-    new MutationObserver(function (mutations) {
-      if (document.getElementById("topnext")) {
-        document.getElementById("topnext").scrollIntoView(true);
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
-
-    new MutationObserver(function (mutations) {
-      if (document.querySelector("#comicbody > a > img")) {
-        const img = document.querySelector(
-          "#comicbody > a > img"
-        ) as HTMLImageElement;
-        img.src = img.src.replace(/^http:/, "https:");
-        this.disconnect();
-      }
-    }).observe(document, { childList: true, subtree: true });
+  elementModifiers = {
+    "#sidebar": (element: HTMLElement) => element.remove(),
+    "#comicbody > table": (element: HTMLElement) => element.remove(),
+    "#comicbody > p": (element: HTMLElement) => element.remove(),
+    "#bottomprev": (element: HTMLAnchorElement) =>
+      (element.href = element.href.replace("http://", "https://")),
+    "#bottomnext": (element: HTMLAnchorElement) =>
+      (element.href = element.href.replace("http://", "https://")),
+    "#comicbody > a > img": (img: HTMLImageElement) =>
+      (img.src = img.src.replace(/^http:/, "https:")),
   };
+
   scrollIntoView = () =>
     document.getElementById("topnext").scrollIntoView(true);
   getNextPageButton = () =>

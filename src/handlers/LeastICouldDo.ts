@@ -6,12 +6,11 @@ export class LeastICouldDo extends SiteHandler {
   static urlStartsWith = "leasticoulddo.com/comic";
   imageMatchRegex = /img class="comic" src="(.*?)"/;
 
-  after = () => {
-    const comicItem = document.getElementsByClassName(
-      "comic"
-    )[0] as HTMLDivElement;
-    comicItem.style.maxWidth = "1500px";
-    comicItem.style.margin = "auto";
+  elementModifiers = {
+    "img.comic": (element: HTMLElement) => {
+      element.style.maxWidth = "1500px";
+      element.style.margin = "auto";
+    },
   };
 
   getNextPageButton = () =>

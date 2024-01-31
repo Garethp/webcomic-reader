@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "author": "Gareth Parker",
   "name": "Webcomic Reader",
-  "version": "1.0.0",
+  "version": "1.0.3",
 
   "action": {
     "default_icon": {

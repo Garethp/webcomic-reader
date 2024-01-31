@@ -6,14 +6,6 @@ export class NuklearPower extends SiteHandler {
   static urlStartsWith = "nuklearpower.com";
   imageMatchRegex = /<div id="comic">\s+?<img src="(.*?)"/;
 
-  after = () => {
-    const comicItem = document.getElementsByClassName(
-      "comic"
-    )[0] as HTMLDivElement;
-    comicItem.style.maxWidth = "1500px";
-    comicItem.style.margin = "auto";
-  };
-
   getNextPageButton = () =>
     document.querySelector("a[rel=next]") as HTMLAnchorElement;
   getPreviousPageButton = () =>

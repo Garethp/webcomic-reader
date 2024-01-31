@@ -67,7 +67,10 @@ const addPrefetchLink = (url, as) => {
   });
 
   const handler = await GetHandlerByUrl(window.location.toString());
+
+  handler?.attachElementModifiers();
   handler?.before();
+
   if (!handler) return;
 
   document.addEventListener("keydown", (e) => {

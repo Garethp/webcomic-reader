@@ -1,6 +1,8 @@
 // Listen for messages from content scripts
 const browser = require("webextension-polyfill");
 
+export const isManifestV3 = browser.runtime.getManifest().manifest_version == 3;
+
 browser.runtime.onMessage.addListener(async (request, sender) => {
   const config = await browser.storage.sync.get(request.webcomic);
 
@@ -50,28 +52,32 @@ browser.runtime.onMessage.addListener(async (request, sender) => {
   }
 });
 
-browser.runtime.onInstalled.addListener(() => {
-  browser.contextMenus.onClicked.addListener(async (info) => {
-    if (info.menuItemId === "build-custom-handler") {
-      const currentTab = (
-        await browser.tabs.query({
-          active: true,
-          lastFocusedWindow: true,
-        })
-      )[0];
+async function handleContextMenu(info) {
+  if (info.menuItemId === "build-custom-handler") {
+    const currentTab = (
+      await browser.tabs.query({
+        active: true,
+        lastFocusedWindow: true,
+      })
+    )[0];
 
-      if (!currentTab) return;
-      await browser.tabs.sendMessage(currentTab.id, {
-        type: "buildCustomHandler",
-      });
-    }
+    if (!currentTab) return;
+    await browser.tabs.sendMessage(currentTab.id, {
+      type: "buildCustomHandler",
+    });
+  }
 
-    if (info.menuItemId.startsWith("webcomic-")) {
-      const webcomic = info.menuItemId.replace("webcomic-", "");
-      const result = await browser.storage.sync.get(webcomic);
-      browser.tabs.create({ url: result[webcomic].url });
-    }
-  });
+  if (info.menuItemId.startsWith("webcomic-")) {
+    const webcomic = info.menuItemId.replace("webcomic-", "");
+    const result = await browser.storage.sync.get(webcomic);
+    browser.tabs.create({ url: result[webcomic].url });
+  }
+}
+
+function registerContextMenus() {
+  browser.contextMenus.onClicked.removeListener(handleContextMenu);
+  browser.contextMenus.onClicked.addListener(handleContextMenu);
+  browser.contextMenus.removeAll();
 
   browser.contextMenus.create({
     id: "webcomic-comics",
@@ -87,6 +93,8 @@ browser.runtime.onInstalled.addListener(() => {
 
   // Get all the webcomics from the config and add a context menu item for each
   browser.storage.sync.get().then((config) => {
+    console.log(config);
+
     Object.keys(config).forEach((webcomic) => {
       createWebcomicContextMenu(
         config[webcomic].id,
@@ -95,7 +103,11 @@ browser.runtime.onInstalled.addListener(() => {
       );
     });
   });
-});
+}
+
+registerContextMenus();
+
+browser.storage.sync.onChanged.addListener(registerContextMenus);
 
 const createWebcomicContextMenu = (id: string, title: string, icon: string) => {
   try {
