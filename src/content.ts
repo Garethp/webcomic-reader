@@ -11,7 +11,42 @@ const addPrefetchLink = (url, as) => {
 };
 
 (async function () {
-  document.addEventListener("DOMContentLoaded", async () => {
+  let handlePageChangeLastCalled = 0;
+
+  const handlePageChange =  async () => {
+    if (handlePageChangeLastCalled > Date.now() - 300) {
+      return;
+    }
+
+    handlePageChangeLastCalled = Date.now();
+
+    console.log('handlePageChange');
+
+    if (!document.getElementById("webcomic-history-hook")) {
+      console.log("Adding hook");
+      const historyHook = document.createElement("script");
+      historyHook.id = "webcomic-history-hook";
+      historyHook.type = "text/javascript";
+      historyHook.text = `
+        window.history.pushState = new Proxy(window.history.pushState, {
+          apply: (target, thisArg, argArray) => {
+            // trigger here what you need
+            window.dispatchEvent(new Event('pushstate'));
+            return target.apply(thisArg, argArray);
+          },
+        });
+        
+        window.history.replaceState = new Proxy(window.history.replaceState, {
+          apply: (target, thisArg, argArray) => {
+            // trigger here what you need
+            window.dispatchEvent(new Event('replaceState'));
+            return target.apply(thisArg, argArray);
+          },
+        });
+    `;
+      document.body.appendChild(historyHook);
+    }
+
     const handler = await GetHandlerByUrl(window.location.toString());
     if (!handler) return;
 
@@ -64,7 +99,11 @@ const addPrefetchLink = (url, as) => {
     handler.after();
 
     void storeLatestUrl(handler.id, handler.name, window.location.toString());
-  });
+  };
+
+  window.addEventListener("replaceState", handlePageChange);
+
+  document.addEventListener("DOMContentLoaded", handlePageChange);
 
   const handler = await GetHandlerByUrl(window.location.toString());
 

@@ -2,3 +2,6 @@
 build/
 node_modules/
 web-ext-artifacts/
+
+.yarn/*
+!.yarn/releases/
