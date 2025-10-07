@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "author": "Gareth Parker",
   "name": "Webcomic Reader",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "browser_specific_settings": {
     "gecko": {
       "id": "{4fccc0ab-d2e4-45da-ae5e-7956b5e7af0d}"
